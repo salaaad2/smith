@@ -4,4 +4,5 @@
 tmp/
 csrc/obj
 libsmith.a
+smith
 go.sum

@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+config.json
 *.log
 tmp/
 csrc/obj

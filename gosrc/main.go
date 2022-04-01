@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 // #include "../csrc/smith.h"
@@ -28,6 +29,12 @@ func main() {
 	"\nI will try to help you get the bag...")
 
 	config_path := "./config.json"
+	for i, a := range os.Args[1:] {
+		if a == "-c" || a == "--config" {
+			config_path = os.Args[i + 2]
+		}
+	}
+
 	config_content, err := ioutil.ReadFile(config_path)
 	if err != nil {
 		log.Fatal("config file not found")
@@ -35,7 +42,6 @@ func main() {
 
 	var config Config
 	err = json.Unmarshal(config_content, &config)
-
 	if err != nil {
 		log.Fatal("error during marshall() ", err)
 	}
@@ -44,4 +50,6 @@ func main() {
 		Styles.colorBlue + "public_key: " + Styles.colorReset + config.Public_key + "\n" +
 		Styles.colorBlue + "secret_key: " + Styles.colorReset + config.Secret_key + "\n" +
 		Styles.colorBlue + "mirror:     " + Styles.colorReset + config.Mirror)
+
+	make_body("qwe", "qwe", "qwe")
 }

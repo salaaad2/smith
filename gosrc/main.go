@@ -8,13 +8,14 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
-	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/gizak/termui/v3"
 )
 
 // #include "../csrc/smith.h"
@@ -48,35 +49,80 @@ func main() {
 		log.Fatal("error: marshall() ", err)
 	}
 
-	make_ui()
-
-	fmt.Println("\n" +
-		Styles.colorBlue + "public_key: " + Styles.colorReset + config.Public_key + "\n" +
-		Styles.colorBlue + "secret_key: " + Styles.colorReset + config.Secret_key + "\n" +
-		Styles.colorBlue + "mirror:     " + Styles.colorReset + config.Mirror)
-
 	// make request body and sign it
 	body := make_body("qwe", "qwe", "qwe")
-	fmt.Println(body)
-	signature := sign_request(body, config.Secret_key)
-	fmt.Println("[" + signature + "]")
+	signature := sign_request(body, "hello")
+	ui_loop(config, body, signature)
+	defer ui.Close()
 }
 
-func make_ui() error {
+// draw stuff
+func ui_loop(config Config, body string, signature string) error {
 	if err := ui.Init(); err != nil {
 		log.Fatal("error: failed to initialize termui", err)
 	}
 
-	p:= widgets.NewParagraph()
-	p.Text = "hello"
-	p.SetRect(0, 0, 25, 5)
-	ui.Render(p)
+	// set widgets
+	p1 := widgets.NewParagraph()
+	p2 := widgets.NewParagraph()
+	p3 := widgets.NewParagraph()
+	p4 := widgets.NewParagraph()
+	p5 := widgets.NewParagraph()
 
-	for e := range ui.PollEvents() {
-		if e.Type == ui.KeyboardEvent {
-			return nil
+	p1.Text = config.Mirror
+	p2.Text = "1000.0 BTC"
+	p3.Text = body
+	p4.Text = signature
+	p5.Text = C.GoString(C.mr_smith())
+	p5.TextStyle.Fg = ui.ColorGreen
+
+	p1.Border = true
+	p2.Border = true
+	p3.Border = true
+	p4.Border = true
+
+	p1.Title = "Mirror"
+	p2.Title = "Balance"
+	p3.Title = "public"
+	p4.Title = "Key"
+	p5.Title = "hello"
+
+	main_grid := ui.NewGrid()
+	termWidth, termHeight := ui.TerminalDimensions()
+	main_grid.SetRect(0, 0, termWidth, termHeight)
+	main_grid.Border = true
+
+	// add items to grid
+	main_grid.Set(
+		ui.NewRow(0.1, p5),
+		ui.NewRow(1.0/8, p2),
+		ui.NewRow(1.0/2, p1),
+		ui.NewRow(1.0/2,
+			ui.NewCol(1.0/2, p3),
+			ui.NewCol(1.0/2, p4),
+		),
+	)
+
+	// ui update loop
+	ui.Render(main_grid)
+	ui_events := ui.PollEvents()
+	ticker := time.NewTicker(time.Second).C
+	ticker_count := 0
+	for {
+		select {
+		case e := <-ui_events:
+			switch e.ID {
+				case "q", "<C-c>":
+					return nil
+				case "<Resize>":
+					payload := e.Payload.(ui.Resize)
+					main_grid.SetRect(0, 0, payload.Width, payload.Height)
+					ui.Clear()
+					ui.Render(main_grid)
+			}
+		case <-ticker:
+			ui.Render(main_grid)
+			ticker_count++
 		}
 	}
-
-	return nil
 }

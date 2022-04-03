@@ -16,7 +16,7 @@ mr_smith()
 }
 
 long
-c_get_timestamp()
+get_timestamp()
 {
     struct timeval tv;
     long ct;

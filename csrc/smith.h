@@ -11,7 +11,7 @@
 
 #include <unistd.h>
 
-char * c_mr_smith();
-long   c_get_timestamp();
+char * mr_smith();
+long   get_timestamp();
 
 #endif // SMITH_H_

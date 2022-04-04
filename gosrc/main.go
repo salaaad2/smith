@@ -8,30 +8,17 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/gizak/termui/v3/widgets"
 	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
-// #include "../csrc/smith.h"
-// #cgo LDFLAGS: -lsmith -L../
-import "C"
-
-type Config struct {
-    Public_key string
-	Secret_key string
-	Mirror string
-}
-
 func main() {
-	fmt.Println("Welcome, traveller, my name is " + Styles.colorGreen + C.GoString(C.mr_smith()) + Styles.colorReset +
-	"\nI will try to help you get the bag...")
-
 	// get user config from json file
 	config_path := "./config.json"
 	for i, a := range os.Args[1:] {
@@ -49,15 +36,20 @@ func main() {
 		log.Fatal("error: marshall() ", err)
 	}
 
-	// make request body and sign it
-	body := make_body("qwe", "qwe", "qwe")
-	signature := sign_request(body, "hello")
-	ui_loop(config, body, signature)
+	if err != nil {
+		log.Fatal("error: request failed %s", "qwe", err)
+		return
+	}
+	// make a cool ui
+	ui_loop(config)
+
+	fmt.Println("qwe")
 	defer ui.Close()
+	return
 }
 
 // draw stuff
-func ui_loop(config Config, body string, signature string) error {
+func ui_loop(config Config) error {
 	if err := ui.Init(); err != nil {
 		log.Fatal("error: failed to initialize termui", err)
 	}
@@ -71,9 +63,9 @@ func ui_loop(config Config, body string, signature string) error {
 
 	p1.Text = config.Mirror
 	p2.Text = "1000.0 BTC"
-	p3.Text = body
-	p4.Text = signature
-	p5.Text = C.GoString(C.mr_smith())
+	p3.Text = "hello"
+	p4.Text = "cool"
+	p5.Text = "__MR_SMITH_V001__"
 	p5.TextStyle.Fg = ui.ColorGreen
 
 	p1.Border = true
@@ -81,7 +73,7 @@ func ui_loop(config Config, body string, signature string) error {
 	p3.Border = true
 	p4.Border = true
 
-	p1.Title = "Mirror"
+	p1.Title = "Active Mirror"
 	p2.Title = "Balance"
 	p3.Title = "public"
 	p4.Title = "Key"
@@ -112,13 +104,15 @@ func ui_loop(config Config, body string, signature string) error {
 		select {
 		case e := <-ui_events:
 			switch e.ID {
-				case "q", "<C-c>":
+				case "<C-c>":
 					return nil
 				case "<Resize>":
 					payload := e.Payload.(ui.Resize)
 					main_grid.SetRect(0, 0, payload.Width, payload.Height)
 					ui.Clear()
 					ui.Render(main_grid)
+				default:
+					p3.Text = e.ID
 			}
 		case <-ticker:
 			ui.Render(main_grid)
@@ -126,3 +120,8 @@ func ui_loop(config Config, body string, signature string) error {
 		}
 	}
 }
+
+// make request body and sign it
+// body := make_body()
+// signature := sign_request(body, config.Secret_key)
+// res, err := send_request(body, signature, Endpoints.getall, config)

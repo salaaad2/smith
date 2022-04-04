@@ -8,6 +8,8 @@
 
 #include "smith.h"
 #include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 char *
 mr_smith()
@@ -15,13 +17,16 @@ mr_smith()
     return ("---SMITH_V0.0.0---");
 }
 
-long
+char*
 get_timestamp()
 {
     struct timeval tv;
     long ct;
+    char * buffer;
 
+    buffer = (char*)malloc(30);
     gettimeofday(&tv, NULL);
     ct = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-    return (ct);
+    sprintf(buffer, "%ld", ct);
+    return buffer;
 }

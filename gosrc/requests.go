@@ -9,8 +9,40 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 )
+
+// #include "../csrc/smith.h"
+// #cgo LDFLAGS: -lsmith -L../
+import "C"
+
+// send request to mirror and return response
+// @param body      ?qwe=asd&foo=bar
+// @param signature duh
+// @param endpoint  /sapi/v1/capital/config/qwe
+// @param config    duhh
+func send_request(body string, signature string, endpoint string, config Config) (*http.Response, error) {
+	// new client to allow defering of requests
+	client := &http.Client{}
+	url := "https://" + config.Mirror + "/" + endpoint + "?" + body + "&signature=" + signature
+
+	// add some ifs here
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal("error: creating http request ", err)
+	}
+	req.Header.Add("X-MBX-APIKEY", config.Public_key)
+
+	// finished bakiong request. send it
+	response, err := client.Do(req)
+	if err != nil {
+		log.Fatal("error: making http request ", err)
+	}
+
+	defer response.Body.Close()
+	return response, nil
+}
 
 // sign request with given private key
 func sign_request(body string, key string) string {
@@ -33,7 +65,7 @@ func sign_request(body string, key string) string {
 // create body given choice ex :
 // GET /sapi/v1/capital/config/getall ||
 // POST /sapi/v1/asset/dust-btc
-func make_body(order string, ticker string, price string) string {
-	ret := "GET /sapi/v1/capital/config/getall"
+func make_body() string {
+	ret := "timestamp=" + C.GoString(C.get_timestamp()) + "&recvWindow=50000"
 	return ret
 }

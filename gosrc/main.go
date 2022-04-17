@@ -8,7 +8,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -43,12 +42,6 @@ func main() {
 		log.Fatal("error: marshall() ", err)
 	}
 
-	if err != nil {
-		log.Fatalf("error: request failed %s", err)
-		return
-	}
-
-	fmt.Println("hello")
 	ui_loop(config)
 	defer ui.Close()
 	return
@@ -72,6 +65,14 @@ func ui_loop(config Config) error {
 				},
 				{
 					Value: nodeValue("Available Coins"),
+					Nodes: nil,
+				},
+				{
+					Value: nodeValue("Deposit Address"),
+					Nodes: nil,
+				},
+				{
+					Value: nodeValue("Daily Snapshot"),
 					Nodes: nil,
 				},
 			},
@@ -117,9 +118,11 @@ func ui_loop(config Config) error {
 	// add items to grid
 	main_grid.Set(
 		ui.NewRow(0.1, p5),
-		ui.NewRow(1.0/8, p2),
-		ui.NewRow(1.0/2, l),
-		ui.NewRow(1.0/2, output),
+		ui.NewRow(0.1, p2),
+		ui.NewRow(0.8,
+			ui.NewCol(0.2, l),
+			ui.NewCol(0.8, output),
+		),
 	)
 
 	// ui update loop
@@ -151,19 +154,17 @@ func ui_loop(config Config) error {
 					l.ExpandAll()
 				case "C":
 					l.CollapseAll()
-			case "<Enter>":
-				if l.SelectedNode().Nodes == nil {
-					body := make_body()
-					signature := sign_request(body, config.Secret_key)
-					rep, err := send_request(body, signature, l.SelectedNode().Value.String(), config)
-					if rep == nil || err != nil {
-						output.Text = "something went wrong :^{"
-					} else {
-						body, _ := io.ReadAll(rep.Body)
-						output.Text = string(body)
-						defer rep.Body.Close()
+				case "<Enter>":
+					if l.SelectedNode().Nodes == nil {
+						rep, err := sendRequest(l.SelectedNode().Value.String(), config)
+						if rep == nil || err != nil {
+							output.Text = "something went wrong :^{"
+						} else {
+							body, _ := io.ReadAll(rep.Body)
+							output.Text = string(body)
+							defer rep.Body.Close()
+						}
 					}
-				}
 			}
 			case <-ticker:
 				ticker_count++

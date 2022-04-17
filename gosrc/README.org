@@ -1,0 +1,16 @@
+#+title:     Readme
+#+author:    salade
+#+email:     salad@jozanofastora.xyz
+
+* Smith
+Smith is a very good friend of mine, and a robot
+His purpose is to make me money, or as we call it in France, *Cesterces*....
+
+** Building
+Just type
+src_bash[build]{make}
+And you will have a very nice executable called smith
+
+** Usage
+You will find at the source of this repository a file called *default.json*, in which you must insert the correct value to be able to use this program
+Given how early in production this program is, you might feel a little restricted in what you can ask my good friend to do. Don't worry, traveller... Enjoy the ride and the view

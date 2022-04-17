@@ -7,7 +7,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -25,6 +24,14 @@ import "C"
 func send_request(body string, signature string, endpoint string, config Config) (*http.Response, error) {
 	// new client to allow defering of requests
 	client := &http.Client{}
+	switch (endpoint) {
+	case "Account Status":
+		endpoint = Endpoints.status
+	case "Available Coins":
+		endpoint = Endpoints.getall
+	case "Buy X coin ":
+		return nil, nil
+	}
 	url := "https://" + config.Mirror + "/" + endpoint + "?" + body + "&signature=" + signature
 
 	// add some ifs here
@@ -40,13 +47,11 @@ func send_request(body string, signature string, endpoint string, config Config)
 		log.Fatal("error: making http request ", err)
 	}
 
-	defer response.Body.Close()
 	return response, nil
 }
 
 // sign request with given private key
 func sign_request(body string, key string) string {
-	fmt.Println("signing request : ", body)
 
 	// run pipeline
 	out2, err := RunStrings("/usr/bin/echo", "-n", body, "|", "/usr/bin/openssl", "dgst", "-sha256", "-hmac", key)

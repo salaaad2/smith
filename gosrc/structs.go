@@ -16,11 +16,13 @@ type Config struct {
 // urls to hit on mirror
 type Targets struct {
 	getall		string
+	status		string
 	null		string
 }
 
 var Endpoints = Targets {
 	getall:		"/sapi/v1/capital/config/getall",
+	status:		"/sapi/v1/account/status",
 	null:		"/null",
 }
 

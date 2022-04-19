@@ -7,6 +7,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -57,6 +59,31 @@ func getRequestType(name string) string {
 		default :
 			return ""
 	}
+}
+
+func displayResponse(node_name string, response *http.Response, output *string) {
+	requestType := getRequestType(node_name)
+	body, _ := io.ReadAll(response.Body)
+	var outputFormatted string
+
+	switch (requestType) {
+		case GET_Targets.status:
+			var structuredRep AccountStatusResponse
+			json.Unmarshal(body, &structuredRep)
+			outputFormatted =
+				"Status     [" + structuredRep.Data + "]\n"
+		case GET_Targets.address:
+			var structuredRep DepositAddressResponse
+			json.Unmarshal(body, &structuredRep)
+			outputFormatted =
+				"Coin     [" + structuredRep.Coin + "]\n" +
+				"Address  [" + structuredRep.Address + "]\n" +
+				"Url      [" + structuredRep.Url + "]\n" +
+				"Tag      [" + structuredRep.Tag + "]\n"
+		default:
+			outputFormatted = string(body)
+	}
+	*output = outputFormatted
 }
 
 // Sign payload using openssl

@@ -8,7 +8,6 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -103,7 +102,8 @@ func ui_loop(config Config) error {
 
 	p1.Border = true
 	p2.Border = true
-	output.Border = false
+	output.Border = true
+	output.TextStyle.Fg = ui.ColorGreen
 
 	p1.Title = "Active Mirror"
 	p2.Title = "Balance"
@@ -160,8 +160,7 @@ func ui_loop(config Config) error {
 						if rep == nil || err != nil {
 							output.Text = "something went wrong :^{"
 						} else {
-							body, _ := io.ReadAll(rep.Body)
-							output.Text = string(body)
+							displayResponse(l.SelectedNode().Value.String(), rep, &output.Text)
 							defer rep.Body.Close()
 						}
 					}

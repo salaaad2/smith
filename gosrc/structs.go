@@ -6,13 +6,6 @@
 
 package main
 
-// config.json content
-type Config struct {
-    Public_key string
-	Secret_key string
-	Mirror string
-}
-
 // urls to hit on mirror
 type Targets struct {
 	getall		string
@@ -36,4 +29,42 @@ var POST_Targets = Targets {
 	status:		"/null",
 	snapshot:	"/null",
 	null:		"/null",
+}
+
+// config.json content
+type Config struct {
+    Public_key string
+	Secret_key string
+	Mirror string
+}
+
+//
+// ---- responses ----
+//
+type AccountStatusResponse struct {
+    Data string
+}
+
+type AccountSnapshotResponseMain struct {
+    Code float64
+	Msg string
+	SnapshotVos map[string]interface{}
+}
+
+type AccountSnapshotResponseVos struct {
+	Data map[string]interface{}
+	Type string
+	UpdateTime float64
+}
+
+type AccountSnapshotResponseData struct {
+	Balances []interface{}
+	TotalAssetOfBtc float64
+}
+
+type DepositAddressResponse struct {
+	Address string
+	Coin string
+	Tag string
+	Url string
 }

@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 // #include "../csrc/smith.h"
@@ -61,6 +62,7 @@ func getRequestType(name string) string {
 	}
 }
 
+// display something cool
 func displayResponse(node_name string, response *http.Response, output *string) {
 	requestType := getRequestType(node_name)
 	body, _ := io.ReadAll(response.Body)
@@ -80,6 +82,10 @@ func displayResponse(node_name string, response *http.Response, output *string) 
 				"Address  [" + structuredRep.Address + "]\n" +
 				"Url      [" + structuredRep.Url + "]\n" +
 				"Tag      [" + structuredRep.Tag + "]\n"
+		case GET_Targets.snapshot:
+			var structuredRep AccountSnapshotResponseMain
+			json.Unmarshal(body, &structuredRep)
+			outputFormatted = "code  [" + strconv.FormatFloat(structuredRep.Code, 'f', 2, 64) + "]\n"
 		default:
 			outputFormatted = string(body)
 	}

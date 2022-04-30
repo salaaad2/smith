@@ -6,29 +6,20 @@
 
 package main
 
-// urls to hit on mirror
-type Targets struct {
-	getall		string
-	address		string
-	status		string
-	snapshot	string
-	null		string
-}
+import (
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
+)
 
-var GET_Targets = Targets {
-	getall:		"/sapi/v1/capital/config/getall",
-	address:	"/sapi/v1/capital/deposit/address",
-	status:		"/sapi/v1/account/status",
-	snapshot:	"/sapi/v1/accountSnapshot",
-	null:		"/null",
-}
-
-var POST_Targets = Targets {
-	getall:		"/null",
-	address:	"/null",
-	status:		"/null",
-	snapshot:	"/null",
-	null:		"/null",
+//
+// displayed contents
+//  having a tree and an output makes sense because it just does, ok
+//
+type DisplayGrid struct {
+	output *widgets.Paragraph
+	tree *widgets.Tree
+	grid *ui.Grid
+	name string
 }
 
 // config.json content
@@ -67,4 +58,31 @@ type DepositAddressResponse struct {
 	Coin string
 	Tag string
 	Url string
+}
+
+//
+// urls to hit on mirror
+//
+type Targets struct {
+	getall		string
+	address		string
+	status		string
+	snapshot	string
+	null		string
+}
+
+var GET_Targets = Targets {
+	getall:		"/sapi/v1/capital/config/getall",
+	address:	"/sapi/v1/capital/deposit/address",
+	status:		"/sapi/v1/account/status",
+	snapshot:	"/sapi/v1/accountSnapshot",
+	null:		"/null",
+}
+
+var POST_Targets = Targets {
+	getall:		"/null",
+	address:	"/null",
+	status:		"/null",
+	snapshot:	"/null",
+	null:		"/null",
 }

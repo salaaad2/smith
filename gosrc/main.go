@@ -16,12 +16,6 @@ import (
 	ui "github.com/gizak/termui/v3"
 )
 
-type nodeValue string
-
-func (nv nodeValue) String() string {
-	return string(nv)
-}
-
 func main() {
 	// get user config from json file
 	config_path := "./config.json"
@@ -45,7 +39,7 @@ func main() {
 	return
 }
 
-// draw stuff
+// draw stuff and get input
 func ui_loop(config Config) error {
 	if err := ui.Init(); err != nil {
 		log.Fatal("error: failed to initialize termui", err)
@@ -84,6 +78,11 @@ func ui_loop(config Config) error {
 					active_grid.tree.CollapseAll()
 				case "<Enter>":
 					active_grid.handleEnter(config)
+				case "2":
+					active_grid = createTradeWorkspace(config)
+					ui.Clear()
+					ui.Render(active_grid.grid)
+					ui_events = ui.PollEvents()
 			}
 			case <-ticker:
 				ticker_count++

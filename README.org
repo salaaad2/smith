@@ -4,6 +4,7 @@
 
 * Smith
 Smith is a very good friend of mine, and a robot
+He is also a work in progress.
 His purpose is to make me money, or as we call it in France, *Cesterces*....
 
 ** Building
@@ -11,6 +12,20 @@ Just type
 src_bash[build]{make}
 And you will have a very nice executable called smith
 
+** Current Usage
+The current state of smith does not allow him to make money. However, you can see in this repository a somewhat good way to interact with the Binance API.
+The following endpoints can be called :
+``
+getall:	"/sapi/v1/capital/config/getall",
+address:	"/sapi/v1/capital/deposit/address",
+status:	"/sapi/v1/account/status",
+snapshot:	"/sapi/v1/accountSnapshot",
+``
+The code found in gosrc/structs and gosrc/requests in addition to the code found in csrc/ can be used and expanded as an example to make your own program that calls the Binance API
+*** How it works:
+Binance api calls need to be signed and most require a timestamp.
+- The timestamp is gotten through the C code
+- Signing calls is done using openssl; signRequests() does all that
 ** Usage
 You will find at the source of this repository a file called *default.json*, in which you must insert the correct value to be able to use this program
 Given how early in production this program is, you might feel a little restricted in what you can ask my good friend to do. Don't worry, traveller... Enjoy the ride and the view
